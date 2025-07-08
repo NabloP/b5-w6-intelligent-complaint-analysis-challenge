@@ -90,6 +90,53 @@ This architecture ensures answers are both insightful and verifiable.
 
 ---
 
+## 🏗 Project Components Completed (Tasks 1 & 2)
+
+### ✅ Clean Ingestion & Exploratory Data Analysis (Task 1)
+
+We ingested and analyzed over **650,000 consumer complaints** from the **Consumer Financial Protection Bureau (CFPB)**, performing:
+- 📊 **Complaint Volume Analysis** by product, time, and narrative length
+- 🧹 **Schema Audit & Missingness Diagnostics** to ensure only business-relevant, high-integrity fields were retained
+- 📝 **Text Preprocessing** using a **lossless cleaning pipeline** (`src/chunking/text_cleaner.py`) to preserve linguistic nuances crucial for semantic search
+
+Key Output:  
+`data/interim/filtered_complaints.csv`  
+Containing ~270,000 cleaned and filtered complaint narratives across **five strategic financial products**:  
+Credit Cards, Personal Loans, Buy Now Pay Later (BNPL), Savings Accounts, and Money Transfers.
+
+---
+
+### ✅ Text Chunking, Embedding & ChromaDB Indexing (Task 2)
+
+To prepare complaint narratives for efficient semantic search, we built a **modular chunking and embedding pipeline** using:
+
+| Component | Implementation Details |
+|-----------|------------------------|
+| **Chunking Logic** | Used **LangChain’s RecursiveCharacterTextSplitter** (`src/chunking/text_chunker.py`) with:<br> • Chunk Size: **500 tokens** <br> • Overlap: **50 tokens** <br> This preserves context while staying within embedding model limits. |
+| **Embedding Model** | Chose **all-MiniLM-L6-v2** for:<br> • ⚡ **Speed**: Fast inference on CPU<br> • 🎯 **Accuracy**: Strong semantic matching performance in general language and complaint-style text |
+| **Vector Store** | Created a **ChromaDB** vector store (`src/chunking/vector_store_builder.py`), storing:<br> • Embeddings<br> • Associated metadata (Product, Date, Complaint ID, Raw Text)<br> • Persisted under `/vector_store/` for fast, reusable semantic retrieval |
+
+We opted for **ChromaDB** over FAISS to take advantage of:
+- **Native metadata storage**
+- **Lightweight integration with LangChain**
+- **Ease of deployment in production workflows**
+
+Key Script:  
+`scripts/embedding_runner.py`  
+Allows end-to-end execution of chunking, embedding, and vector index creation in a single command.
+
+---
+
+## 🔗 Key Technology Decisions & Justifications
+
+| Decision | Rationale |
+|----------|-----------|
+| ✅ **ChromaDB** over FAISS | Better metadata handling, easier integration with LangChain for future RAG deployment |
+| ✅ **all-MiniLM-L6-v2** | Optimal trade-off between **semantic precision** and **computational efficiency**—ideal for CrediTrust’s real-time requirements |
+| ✅ **Recursive Chunking** | Ensures **no context loss** for long-form complaints while enabling short narratives to pass unaltered |
+
+---
+
 <!-- TREE START -->
 📁 Project Structure
 
@@ -102,31 +149,41 @@ solar-challenge-week1/
 │   ├── ui_helpers.py
 ├── data/
 │   ├── interim/
+│   │   ├── filtered_complaints.csv
 │   ├── processed/
 │   └── raw/
+│       ├── complaints.csv
 ├── notebooks/
 │   ├── task-1-eda-preprocessing.ipynb
 │   ├── task-2-embedding-indexing.ipynb
 ├── scripts/
+│   ├── embedding_runner.py
 │   ├── generate_tree.py
 ├── src/
 │   ├── __init__.py
-│   ├── chunking_module.py
 │   ├── data_loader.py
-│   ├── embedding_module.py
 │   ├── rag_pipeline.py
 │   ├── retriever.py
-│   ├── text_cleaner.py
+│   ├── chunking/
+│   │   ├── embedding_generator.py
+│   │   ├── text_chunker.py
+│   │   ├── text_cleaner.py
+│   │   ├── vector_store_builder.py
+│   └── eda/
+│       ├── eda_visualizer.py
+│       ├── schema_auditor.py
 └── vector_store/
 <!-- TREE END -->
 ---
 
 ## ✅ Interim Status (as of July 6)
 
-- ✅ **Task 1 complete:** Data exploration and cleaning completed; interim dataset saved.
-- ✅ **Task 2 complete:** Text chunking, embedding with `all-MiniLM-L6-v2`, FAISS vector store created.
-- 🔵 Task 3 (RAG pipeline & evaluation): In progress
-- 🔵 Task 4 (Streamlit chatbot): Pending
+| Task # | Task Description | Status | Key Deliverables |
+|--------|------------------|--------|------------------|
+| **1** | Data Exploration & Cleaning | ✅ Completed | Cleaned dataset, EDA notebooks, schema diagnostics |
+| **2** | Chunking & Embedding with ChromaDB | ✅ Completed | Modular scripts, persisted vector store |
+| **3** | RAG Pipeline & Evaluation | 🔵 In Progress | Retriever + Generator logic under development |
+| **4** | Interactive Streamlit Chatbot | 🔵 Pending | Planned for Task 4 |
 
 ---
 
@@ -141,34 +198,40 @@ solar-challenge-week1/
 
 ---
 
-## 🚀 Planned Deliverables
+## 🔍 Next Steps
 
-| Deliverable                              | Format                           |
-|------------------------------------------|-----------------------------------|
-| Cleaned complaint dataset                | `data/interim/filtered_complaints.csv` |
-| EDA Notebook                             | `notebooks/task_1_eda_preprocessing.ipynb` |
-| Embedding & Indexing Module              | `src/embedding_module.py`         |
-| Persisted Vector Store                   | `vector_store/`                   |
-| RAG Pipeline Module                      | `src/rag_pipeline.py`             |
-| Interactive Chatbot                      | `app/app.py`                      |
-
+1. Build the **Retriever + LLM Prompt** pipeline using precomputed embeddings.
+2. Conduct **qualitative evaluation** using a curated question bank.
+3. Deploy an **interactive Streamlit app** for CrediTrust’s internal teams.
+4. Implement **explainability layers** to enhance trust and regulatory compliance.
 
 ---
 
-## 🔗 References
+## 🚀 Planned Final Deliverables
 
-Key sources used for this challenge:
+| Deliverable | Format / Location |
+|------------|-------------------|
+| Cleaned Complaint Dataset | `data/interim/filtered_complaints.csv` |
+| EDA & Visuals | `notebooks/task-1-eda-preprocessing.ipynb` |
+| Embedding & Indexing Pipeline | `scripts/embedding_runner.py` |
+| ChromaDB Vector Store | `/vector_store/` |
+| RAG Pipeline | `src/rag_pipeline.py` |
+| Streamlit Chatbot | `app/app.py` |
 
-- [LangChain Documentation](https://python.langchain.com/)
-- [FAISS by Facebook AI](https://github.com/facebookresearch/faiss)
-- [Hugging Face Transformers](https://huggingface.co/docs/transformers/index)
-- [Streamlit Documentation](https://docs.streamlit.io/)
-- [Consumer Financial Protection Bureau (CFPB)](https://www.consumerfinance.gov/data-research/consumer-complaints/)
+---
+
+## 📚 References
+
+- LangChain Documentation
+- ChromaDB
+- Hugging Face Sentence Transformers
+- Streamlit
+- CFPB Open Data
 
 ---
 
 ## 👤 Author
 
 **Nabil Mohamed**  
-AIM Bootcamp Participant  
+10 Academy AIM Bootcamp Participant  
 GitHub: [@NabloP](https://github.com/NabloP)
