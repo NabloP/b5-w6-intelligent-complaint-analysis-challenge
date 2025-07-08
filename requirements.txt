@@ -1,0 +1,55 @@
+# -------------------------
+# ENVIRONMENT MANAGEMENT
+# -------------------------
+python-dotenv
+
+# -------------------------
+# CORE DATA LIBRARIES
+# -------------------------
+pandas
+numpy
+scikit-learn
+
+# -------------------------
+# TEXT PROCESSING & EMBEDDING
+# -------------------------
+nltk
+spacy
+sentence-transformers
+
+# -------------------------
+# VECTOR DATABASES
+# -------------------------
+faiss-cpu
+chromadb
+
+# -------------------------
+# RAG PIPELINE & LLM INTEGRATION
+# -------------------------
+langchain
+transformers
+tiktoken
+
+# -------------------------
+# WEB APP & INTERACTIVE UI
+# -------------------------
+streamlit
+
+# -------------------------
+# VISUALIZATION
+# -------------------------
+matplotlib
+seaborn
+plotly
+
+# -------------------------
+# TESTING & LINTING
+# -------------------------
+pytest
+flake8
+black
+
+# -------------------------
+# INTERACTIVE ANALYSIS
+# -------------------------
+jupyterlab
