@@ -62,6 +62,7 @@ project-tree.txt
 data/raw/
 data/cleaned/
 data/enriched/
+/vector_store/
 
 # Let DVC track pointer files
 !data/**/*.dvc
