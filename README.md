@@ -90,57 +90,14 @@ This architecture ensures answers are both insightful and verifiable.
 
 ---
 
-## 🏗 Project Components Completed (Tasks 1 & 2)
-
-### ✅ Clean Ingestion & Exploratory Data Analysis (Task 1)
-
-We ingested and analyzed over **650,000 consumer complaints** from the **Consumer Financial Protection Bureau (CFPB)**, performing:
-- 📊 **Complaint Volume Analysis** by product, time, and narrative length
-- 🧹 **Schema Audit & Missingness Diagnostics** to ensure only business-relevant, high-integrity fields were retained
-- 📝 **Text Preprocessing** using a **lossless cleaning pipeline** (`src/chunking/text_cleaner.py`) to preserve linguistic nuances crucial for semantic search
-
-Key Output:  
-`data/interim/filtered_complaints.csv`  
-Containing ~270,000 cleaned and filtered complaint narratives across **five strategic financial products**:  
-Credit Cards, Personal Loans, Buy Now Pay Later (BNPL), Savings Accounts, and Money Transfers.
-
 ---
 
-### ✅ Text Chunking, Embedding & ChromaDB Indexing (Task 2)
-
-To prepare complaint narratives for efficient semantic search, we built a **modular chunking and embedding pipeline** using:
-
-| Component | Implementation Details |
-|-----------|------------------------|
-| **Chunking Logic** | Used **LangChain’s RecursiveCharacterTextSplitter** (`src/chunking/text_chunker.py`) with:<br> • Chunk Size: **500 tokens** <br> • Overlap: **50 tokens** <br> This preserves context while staying within embedding model limits. |
-| **Embedding Model** | Chose **all-MiniLM-L6-v2** for:<br> • ⚡ **Speed**: Fast inference on CPU<br> • 🎯 **Accuracy**: Strong semantic matching performance in general language and complaint-style text |
-| **Vector Store** | Created a **ChromaDB** vector store (`src/chunking/vector_store_builder.py`), storing:<br> • Embeddings<br> • Associated metadata (Product, Date, Complaint ID, Raw Text)<br> • Persisted under `/vector_store/` for fast, reusable semantic retrieval |
-
-We opted for **ChromaDB** over FAISS to take advantage of:
-- **Native metadata storage**
-- **Lightweight integration with LangChain**
-- **Ease of deployment in production workflows**
-
-Key Script:  
-`scripts/embedding_runner.py`  
-Allows end-to-end execution of chunking, embedding, and vector index creation in a single command.
-
----
-
-## 🔗 Key Technology Decisions & Justifications
-
-| Decision | Rationale |
-|----------|-----------|
-| ✅ **ChromaDB** over FAISS | Better metadata handling, easier integration with LangChain for future RAG deployment |
-| ✅ **all-MiniLM-L6-v2** | Optimal trade-off between **semantic precision** and **computational efficiency**—ideal for CrediTrust’s real-time requirements |
-| ✅ **Recursive Chunking** | Ensures **no context loss** for long-form complaints while enabling short narratives to pass unaltered |
-
----
+## 📁 Project Structure
 
 <!-- TREE START -->
 📁 Project Structure
 
-solar-challenge-week1/
+b5-w6-intelligent-complaint-analysis-challenge/
 ├── LICENSE
 ├── README.md
 ├── requirements.txt
@@ -150,73 +107,77 @@ solar-challenge-week1/
 ├── data/
 │   ├── interim/
 │   │   ├── filtered_complaints.csv
+│   ├── plots/
+│   │   ├── complaint_volume_by_product.png
+│   │   ├── distribution_complaint_narrative_lengths.png
+│   │   ├── missing_values_heatmap.png
+│   │   ├── monthly_complaint_volume_over_time.png
 │   ├── processed/
 │   └── raw/
 │       ├── complaints.csv
 ├── notebooks/
 │   ├── task-1-eda-preprocessing.ipynb
 │   ├── task-2-embedding-indexing.ipynb
+│   ├── task-3-rag.ipynb
 ├── scripts/
 │   ├── embedding_runner.py
 │   ├── generate_tree.py
+│   ├── rag_pipeline.py
+│   ├── run_streamlit.py
 ├── src/
 │   ├── __init__.py
 │   ├── data_loader.py
-│   ├── rag_pipeline.py
-│   ├── retriever.py
 │   ├── chunking/
 │   │   ├── embedding_generator.py
 │   │   ├── text_chunker.py
 │   │   ├── text_cleaner.py
 │   │   ├── vector_store_builder.py
-│   └── eda/
-│       ├── eda_visualizer.py
-│       ├── schema_auditor.py
+│   ├── eda/
+│   │   ├── eda_visualizer.py
+│   │   ├── schema_auditor.py
+│   └── rag/
+│       ├── answer_generator.py
+│       ├── chroma_loader.py
+│       ├── prompt_template.py
+│       ├── qualitative_evaluator.py
+│       ├── retriever.py
+├── ui/
+│   ├── app.py
 └── vector_store/
+    ├── chroma.sqlite3
+    └── chroma_db/
+        ├── chroma.sqlite3
+        └── 8783f26e-2984-4f72-b4b2-dbd817307c15/
+            ├── data_level0.bin
+            ├── header.bin
+            ├── index_metadata.pickle
+            ├── length.bin
+            ├── link_lists.bin
 <!-- TREE END -->
 ---
 
-## ✅ Interim Status (as of July 6)
+## ✅ Status (as of July 8)
 
-| Task # | Task Description | Status | Key Deliverables |
-|--------|------------------|--------|------------------|
-| **1** | Data Exploration & Cleaning | ✅ Completed | Cleaned dataset, EDA notebooks, schema diagnostics |
-| **2** | Chunking & Embedding with ChromaDB | ✅ Completed | Modular scripts, persisted vector store |
-| **3** | RAG Pipeline & Evaluation | 🔵 In Progress | Retriever + Generator logic under development |
-| **4** | Interactive Streamlit Chatbot | 🔵 Pending | Planned for Task 4 |
+| Decision                          | Rationale                                                                                                  |
+|----------------------------------|------------------------------------------------------------------------------------------------------------|
+| ✅ **ChromaDB** over FAISS         | Better metadata handling, easier integration with LangChain for future RAG deployment                       |
+| ✅ **all-MiniLM-L6-v2**            | Optimal trade-off between **semantic precision** and **computational efficiency**—ideal for CrediTrust’s real-time requirements |
+| ✅ **Recursive Chunking**          | Ensures **no context loss** for long-form complaints while enabling short narratives to pass unaltered      |
+| ✅ **Modular RAG Retriever & Generator** | Enables flexible, scalable retrieval and generation pipeline with streaming and dynamic memory            |
+| ✅ **Google Gemini LLM Integration**     | Leverages state-of-the-art generative models for context-aware, evidence-backed answers                    |
+| ✅ **Streamlit Interactive Chatbot**    | Provides a minimal, fast, and user-friendly interface with live streaming, theme toggling, and source transparency |
+
 
 ---
 
 ## 📊 Task Progress Tracker
 
-| Task # | Task Name                         | Status      | Description |
-|--------|------------------------------------|-------------|-------------|
-| 1      | Exploratory Data Analysis (EDA)    | ✅ Completed | Visualized complaint volumes, lengths, nulls; filtered data for target products. |
-| 2      | Text Chunking & Embedding          | ✅ Completed | Applied RecursiveCharacterTextSplitter, generated embeddings, stored with FAISS. |
-| 3      | RAG Pipeline Core Logic            | 🔵 In Progress | Building retrieval + generation logic and qualitative evaluation. |
-| 4      | Interactive Streamlit Interface    | 🔵 Pending | Streamlit chatbot with source transparency and real-time querying. |
-
----
-
-## 🔍 Next Steps
-
-1. Build the **Retriever + LLM Prompt** pipeline using precomputed embeddings.
-2. Conduct **qualitative evaluation** using a curated question bank.
-3. Deploy an **interactive Streamlit app** for CrediTrust’s internal teams.
-4. Implement **explainability layers** to enhance trust and regulatory compliance.
-
----
-
-## 🚀 Planned Final Deliverables
-
-| Deliverable | Format / Location |
-|------------|-------------------|
-| Cleaned Complaint Dataset | `data/interim/filtered_complaints.csv` |
-| EDA & Visuals | `notebooks/task-1-eda-preprocessing.ipynb` |
-| Embedding & Indexing Pipeline | `scripts/embedding_runner.py` |
-| ChromaDB Vector Store | `/vector_store/` |
-| RAG Pipeline | `src/rag_pipeline.py` |
-| Streamlit Chatbot | `app/app.py` |
+| Task # | Task Name                          | Status       | Description                                                                     |
+|--------|------------------------------------|--------------|---------------------------------------------------------------------------------|
+| 1      | Exploratory Data Analysis (EDA)    | ✅ Completed | Visualized complaint volumes, lengths, nulls; filtered data for target products.|
+| 2      | Text Chunking & Embedding          | ✅ Completed | Applied RecursiveCharacterTextSplitter, generated embeddings, stored with FAISS.|
+| 3      | RAG Pipeline Core Logic            | ✅ Completed | Building retrieval + generation logic and qualitative evaluation.               |
+| 4      | Interactive Streamlit Interface    | ✅ Completed | Streamlit chatbot with source transparency and real-time querying.              |
 
 ---
 
